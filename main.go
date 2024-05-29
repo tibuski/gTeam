@@ -1,8 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Employee struct {
@@ -48,6 +51,10 @@ func createCalendar(month, year int) []Calendar {
 }
 
 func main() {
+
+	database, _ := sql.Open("sqlite3", "./gTeam.db")
+	statement, _ := database.Prepare("CREATE TABLE IF NOT EXISTS people (id INTEGER PRIMARY KEY, name TEXT, email TEXT, team TEXT)")
+	statement.Exec()
 
 	Employees = append(Employees, addEmployee("Laurent Brichet", "laurent@brichet.be", "CVVS"))
 	Employees = append(Employees, addEmployee("Gerard Pascal", "gerard@proximus.lu", "BCNS"))
