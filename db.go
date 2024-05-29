@@ -15,7 +15,8 @@ func initDatabase() {
 	defer db.Close()
 
 	sqlStmt := `
-	CREATE TABLE IF NOT EXISTS people (id INTEGER PRIMARY KEY, name TEXT, email TEXT, team TEXT);
+	CREATE TABLE IF NOT EXISTS people (id INTEGER PRIMARY KEY, name TEXT, email TEXT, team TEXT, UNIQUE (name));
+
 	`
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
