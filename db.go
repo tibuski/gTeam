@@ -15,12 +15,21 @@ func initDatabase() {
 	defer db.Close()
 
 	sqlStmt := `
-	CREATE TABLE IF NOT EXISTS people (id INTEGER PRIMARY KEY, name TEXT, email TEXT, team TEXT, UNIQUE (name));
-
-	`
+				CREATE TABLE IF NOT EXISTS people (
+					email TEXT PRIMARY KEY, 
+					name TEXT, 
+					surname TEXT, 
+					team TEXT, 
+					UNIQUE (email)
+					);
+				`
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return
 	}
+}
+
+func importFromCSV(f string) {
+
 }

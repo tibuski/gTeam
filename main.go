@@ -6,14 +6,15 @@ import (
 )
 
 type Employee struct {
-	Name  string
-	Email string
-	Team  string
+	Email   string
+	Name    string
+	Surname string
+	Team    string
 }
 
 type Calendar struct {
-	Name string
-	Days []string
+	Email string
+	Days  []string
 }
 
 var Employees = []Employee{}
@@ -51,13 +52,5 @@ func main() {
 
 	initDatabase()
 
-	Employees = append(Employees, addEmployee("Laurent Brichet", "laurent@brichet.be", "CVVS"))
-	Employees = append(Employees, addEmployee("Gerard Pascal", "gerard@proximus.lu", "BCNS"))
-	Employees = append(Employees, addEmployee("Pol Dupont", "pol.dupont@proximus.lu", "CVVS"))
-	Employees = append(Employees, addEmployee("Roger Jaco", "Roro.Gege@proximus.lu", "BCNS"))
-
-	// fmt.Println(Employees)
-	// fmt.Println(len(NumberOfDays))
-	// fmt.Println(NumberOfDays)
 	fmt.Println(createCalendar(5, 2024))
 }
