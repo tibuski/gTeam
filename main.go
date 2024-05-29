@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"time"
-
-	_ "github.com/tibuski/gTeam/db"
 )
 
 type Employee struct {
@@ -50,7 +48,8 @@ func createCalendar(month, year int) []Calendar {
 }
 
 func main() {
-	db.initDatabase()
+
+	initDatabase()
 
 	Employees = append(Employees, addEmployee("Laurent Brichet", "laurent@brichet.be", "CVVS"))
 	Employees = append(Employees, addEmployee("Gerard Pascal", "gerard@proximus.lu", "BCNS"))
