@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -7,7 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func initDatabase() {
+func InitDatabase() {
 	db, err := sql.Open("sqlite3", "./gTeam.db")
 	if err != nil {
 		log.Fatal(err)

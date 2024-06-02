@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/tibuski/gTeam/db"
 )
 
 type Employee struct {
@@ -50,7 +52,7 @@ func createCalendar(month, year int) []Calendar {
 
 func main() {
 
-	initDatabase()
+	db.InitDatabase()
 
 	fmt.Println(createCalendar(5, 2024))
 }
