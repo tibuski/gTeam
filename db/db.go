@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"log"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 func InitDatabase() {
-	db, err := sql.Open("sqlite3", "./gTeam.db")
+	db, err := sql.Open("sqlite", "./gTeam.db")
 	if err != nil {
 		log.Fatal(err)
 	}
