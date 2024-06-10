@@ -50,7 +50,7 @@ var TeamCalendar = []Calendar{}
 func main() {
 
 	db.InitDatabase()
-	db.ImportFromCSV(db.CSV_FILE)
+	db.ImportEmployeesFromCSV(db.CSV_FILE)
 
 	// fmt.Println(createCalendar(5, 2024))
 }

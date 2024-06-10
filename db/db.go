@@ -41,7 +41,7 @@ func InitDatabase() {
 
 }
 
-func ImportFromCSV(path string) {
+func ImportEmployeesFromCSV(path string) {
 	f, err := os.Open(path)
 
 	if err != nil {
