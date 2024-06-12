@@ -33,7 +33,7 @@ func InitDatabase() {
 					);
 				`
 	_, err = db.Exec(sqlStmt)
-
+	log.Printf("Creating Tables ...")
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return
@@ -75,13 +75,13 @@ func ImportEmployeesFromCSV(path string) {
 
 		sqlStmt, err := db.Prepare("insert into people(email, name, surname, team) values(?, ?, ?, ?)")
 		if err != nil {
-			log.Fatalf("insert prepare failed: %s", err)
+			log.Fatalf("INSERT prepare FAILED: %s", err)
 		}
 
 		_, err = sqlStmt.Exec(email, name, surname, team)
 		if err != nil {
-			log.Fatalf("insert failed(%s): %s", email, err)
+			log.Fatalf("INSERT has FAILED (%s): %s", email, err)
 		}
 	}
-
+	log.Printf("Import of %s SUCCESS", path)
 }
