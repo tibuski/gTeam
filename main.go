@@ -19,6 +19,11 @@ type Calendar struct {
 var Employees = []Employee{}
 var TeamCalendar = []Calendar{}
 
+const DB_FILE = "./db/gTeam.db"
+const EMPLOYEES_CSV = "./db/employees.csv"
+const EVENTTYPES_CSV = "./db/eventTypes.csv"
+const PERMTYPES_CSV = "./db/permTypes.csv"
+
 // func daysOfTheMonth(month int, year int) []string {
 // 	var days []string
 // 	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
@@ -49,8 +54,10 @@ var TeamCalendar = []Calendar{}
 
 func main() {
 
-	db.InitDatabase()
-	db.ImportEmployeesFromCSV(db.CSV_FILE)
+	db.InitDatabase(DB_FILE)
+	db.ImportEmployeesFromCSV(DB_FILE, EMPLOYEES_CSV)
+	db.ImportTypesFromCSV(DB_FILE, EVENTTYPES_CSV, "eventTypes")
+	db.ImportTypesFromCSV(DB_FILE, PERMTYPES_CSV, "permTypes")
 
 	// fmt.Println(createCalendar(5, 2024))
 }
