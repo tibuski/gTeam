@@ -22,7 +22,9 @@ var TeamCalendar = []Calendar{}
 const DB_FILE = "./db/gTeam.db"
 const EMPLOYEES_CSV = "./db/employees.csv"
 const EVENTTYPES_CSV = "./db/eventTypes.csv"
-const PERMTYPES_CSV = "./db/permTypes.csv"
+const EVENTTABLE_CSV = "./db/eventTable.csv"
+const DUTYTYPES_CSV = "./db/dutyTypes.csv"
+const DUTYTABLE_CSV = "./db/dutyTable.csv"
 
 // func daysOfTheMonth(month int, year int) []string {
 // 	var days []string
@@ -57,7 +59,9 @@ func main() {
 	db.InitDatabase(DB_FILE)
 	db.ImportEmployeesFromCSV(DB_FILE, EMPLOYEES_CSV)
 	db.ImportTypesFromCSV(DB_FILE, EVENTTYPES_CSV, "eventTypes")
-	db.ImportTypesFromCSV(DB_FILE, PERMTYPES_CSV, "permTypes")
+	db.ImportTypesFromCSV(DB_FILE, DUTYTYPES_CSV, "dutyTypes")
+	db.ImportTablesFromCSV(DB_FILE, EVENTTABLE_CSV, "eventTable")
+	db.ImportTablesFromCSV(DB_FILE, DUTYTABLE_CSV, "dutyTable")
 
 	// fmt.Println(createCalendar(5, 2024))
 }
