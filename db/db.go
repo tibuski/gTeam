@@ -168,7 +168,9 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 	defer db.Close()
 
 	for {
+		i := 1
 		record, err := r.Read()
+
 		if errors.Is(err, io.EOF) {
 			break
 		}
@@ -190,6 +192,8 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 		if err != nil {
 			log.Printf("INSERT has FAILED : %s", err)
 		}
+		i++
+		log.Print(i)
 	}
 	log.Printf("Import of %s DONE", f.Name())
 
