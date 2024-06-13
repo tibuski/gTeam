@@ -165,10 +165,19 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 		log.Printf("Failed to open/create file %s with error %s", DB_FILE, err)
 	}
 
+	// Optimize SQLite for faster writes
+	_, err = db.Exec("PRAGMA synchronous = OFF; PRAGMA journal_mode = MEMORY;")
+	if err != nil {
+		log.Printf("Failed to optimize SQLite: %s", err)
+		return
+	}
+
 	defer db.Close()
 
+	var i = 1
+
 	for {
-		i := 1
+
 		record, err := r.Read()
 
 		if errors.Is(err, io.EOF) {
@@ -193,7 +202,9 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 			log.Printf("INSERT has FAILED : %s", err)
 		}
 		i++
-		log.Print(i)
+		if i%1000 == 0 {
+			log.Printf("Imported %d records in %s", i, table)
+		}
 	}
 	log.Printf("Import of %s DONE", f.Name())
 
