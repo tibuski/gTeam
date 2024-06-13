@@ -1,26 +1,30 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/tibuski/gTeam/db"
 )
 
 type Employee struct {
-	Email   string
-	Name    string
-	Surname string
-	Team    string
+	employeeNumber int
+	email          string
+	name           string
+	surname        string
+	team           string
 }
 
 type Calendar struct {
-	Email string
-	Days  []string
+	employeeNumber int
+	days           []string
 }
 
 var Employees = []Employee{}
 var TeamCalendar = []Calendar{}
 
 const DB_FILE = "./db/gTeam.db"
-const EMPLOYEES_CSV = "./db/employees.csv"
+const EMPLOYEES_CSV = "./db/people.csv"
 const EVENTTYPES_CSV = "./db/eventTypes.csv"
 const EVENTTABLE_CSV = "./db/eventTable.csv"
 const DUTYTYPES_CSV = "./db/dutyTypes.csv"
@@ -40,15 +44,10 @@ const DUTYTABLE_CSV = "./db/dutyTable.csv"
 // 	return days
 // }
 
-// func addEmployee(n, e, t string) Employee {
-// 	human := Employee{Name: n, Email: e, Team: t}
-// 	return human
-// }
-
 // func createCalendar(month, year int) []Calendar {
 // 	d := daysOfTheMonth(month, year)
 // 	for _, n := range Employees {
-// 		TeamCalendar = append(TeamCalendar, Calendar{Name: n.Name, Days: d})
+// 		TeamCalendar = append(TeamCalendar, Calendar{employeeNumber: n.ame, Days: d})
 // 	}
 
 // 	return TeamCalendar
@@ -56,12 +55,22 @@ const DUTYTABLE_CSV = "./db/dutyTable.csv"
 
 func main() {
 
-	db.InitDatabase(DB_FILE)
-	db.ImportEmployeesFromCSV(DB_FILE, EMPLOYEES_CSV)
-	db.ImportTypesFromCSV(DB_FILE, EVENTTYPES_CSV, "eventTypes")
-	db.ImportTypesFromCSV(DB_FILE, DUTYTYPES_CSV, "dutyTypes")
-	db.ImportTablesFromCSV(DB_FILE, EVENTTABLE_CSV, "eventTable")
-	db.ImportTablesFromCSV(DB_FILE, DUTYTABLE_CSV, "dutyTable")
+	// db.InitDatabase(DB_FILE)
+	// db.ImportEmployeesFromCSV(DB_FILE, EMPLOYEES_CSV)
+	// db.ImportTypesFromCSV(DB_FILE, EVENTTYPES_CSV, "eventTypes")
+	// db.ImportTypesFromCSV(DB_FILE, DUTYTYPES_CSV, "dutyTypes")
+	// db.ImportTablesFromCSV(DB_FILE, EVENTTABLE_CSV, "eventTable")
+	// db.ImportTablesFromCSV(DB_FILE, DUTYTABLE_CSV, "dutyTable")
 
 	// fmt.Println(createCalendar(5, 2024))
+
+	sqlStmt := "SELECT * FROM eventTable"
+	results, err := db.SelectFromTable(DB_FILE, sqlStmt)
+	if err != nil {
+		log.Fatalf("Query failed: %s", err)
+	}
+
+	for _, row := range results {
+		fmt.Println(row)
+	}
 }

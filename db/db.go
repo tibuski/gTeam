@@ -33,7 +33,6 @@ func InitDatabase(DB_FILE string) {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return
 	}
-
 }
 
 func ImportEmployeesFromCSV(DB_FILE string, csvPath string) {
@@ -133,7 +132,6 @@ func ImportTypesFromCSV(DB_FILE string, csvPath string, table string) {
 		}
 	}
 	log.Printf("Import of %s DONE", f.Name())
-
 }
 
 func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
@@ -207,5 +205,66 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 		}
 	}
 	log.Printf("Import of %s DONE", f.Name())
+}
 
+func SelectFromTable(DB_FILE string, sqlStmt string) ([]map[string]interface{}, error) {
+
+	db, err := sql.Open("sqlite", DB_FILE)
+	if err != nil {
+		log.Printf("Failed to open file %s with error %s", DB_FILE, err)
+	}
+	defer db.Close()
+
+	// Optimize SQLite for faster writes
+	_, err = db.Exec("PRAGMA synchronous = OFF; PRAGMA journal_mode = MEMORY;")
+	if err != nil {
+		log.Printf("Failed to optimize SQLite: %s", err)
+		return nil, err
+	}
+
+	rows, err := db.Query(sqlStmt)
+	if err != nil {
+		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	log.Printf("Executed query: %s", sqlStmt)
+
+	// Get column names
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+	// Create a slice of maps to hold the query results
+	var results []map[string]interface{}
+
+	for rows.Next() {
+		// Create a slice of interfaces to hold each column value
+		values := make([]interface{}, len(columns))
+		// Create a slice of pointers to each value
+		valuePtrs := make([]interface{}, len(columns))
+		for i := range values {
+			valuePtrs[i] = &values[i]
+		}
+
+		// Scan the row into the value pointers
+		if err := rows.Scan(valuePtrs...); err != nil {
+			return nil, err
+		}
+		// Create a map to represent the row
+		rowMap := make(map[string]interface{})
+		for i, col := range columns {
+			rowMap[col] = values[i]
+		}
+
+		// Append the row map to the results slice
+		results = append(results, rowMap)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
