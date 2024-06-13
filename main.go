@@ -64,7 +64,7 @@ func main() {
 
 	// fmt.Println(createCalendar(5, 2024))
 
-	sqlStmt := "SELECT * FROM eventTable"
+	sqlStmt := "SELECT * FROM eventTypes"
 	results, err := db.SelectFromTable(DB_FILE, sqlStmt)
 	if err != nil {
 		log.Fatalf("Query failed: %s", err)
