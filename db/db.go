@@ -11,6 +11,16 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+type Employee struct {
+	employeeNumber int
+	email          string
+	name           string
+	surname        string
+	team           string
+}
+
+var People map[Employee]interface{}
+
 func OpenDatabase(DB_FILE string) *sql.DB {
 
 	database, err := sql.Open("sqlite", DB_FILE)
@@ -188,18 +198,29 @@ func ImportTablesFromCSV(database *sql.DB, csvPath string, table string) {
 	log.Printf("Import of %s DONE", f.Name())
 }
 
-// func SelectFromPeople(filter string) []People{} {
+func SelectFromPeople(database *sql.DB, filter string) {
 
-// 	// Build and run Query
-// 	sqlStmt := `SELECT * from people WHERE employeeNumber LIKE ?`
-// 	log.Printf("Query to be executed :  %s", sqlStmt)
-// 	rows, err := database.Query(sqlStmt, filter)
-// 	if err != nil {
-// 		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
+	var peoples []People
 
-// 	log.Printf("Executed query: %s", sqlStmt)
+	sqlStmt := `SELECT * from people WHERE employeeNumber LIKE ?`
+	log.Printf("Query to be executed :  %s", sqlStmt)
 
-// }
+	// Run query and get row results
+	rows, err := database.Query(sqlStmt, filter)
+
+	if err != nil {
+		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
+	}
+
+	for rows.Next() {
+		var p People
+		if err := rows.Scan(&p.employeeNumber, &p.email, &p.name, &p.surname, &p.team); err != nil {
+			log.Println(err.Error())
+		}
+		peoples = append(peoples, p)
+	}
+
+	log.Printf("Executed query: %s", sqlStmt)
+
+	return (peoples)
+}

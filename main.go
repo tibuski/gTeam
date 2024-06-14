@@ -1,23 +1,16 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/tibuski/gTeam/db"
 )
-
-type People struct {
-	employeeNumber int
-	email          string
-	name           string
-	surname        string
-	team           string
-}
 
 type Calendar struct {
 	employeeNumber int
 	days           []string
 }
 
-var Employees = []People{}
 var TeamCalendar = []Calendar{}
 
 const DB_FILE = "./db/gTeam.db"
@@ -52,16 +45,16 @@ const DUTYTABLE_CSV = "./db/dutyTable.csv"
 
 func main() {
 	database := db.OpenDatabase(DB_FILE)
-	db.InitDatabase(database)
-	db.ImportEmployeesFromCSV(database, EMPLOYEES_CSV)
-	db.ImportTypesFromCSV(database, EVENTTYPES_CSV, "eventTypes")
-	db.ImportTypesFromCSV(database, DUTYTYPES_CSV, "dutyTypes")
-	db.ImportTablesFromCSV(database, EVENTTABLE_CSV, "eventTable")
-	db.ImportTablesFromCSV(database, DUTYTABLE_CSV, "dutyTable")
+	// db.InitDatabase(database)
+	// db.ImportEmployeesFromCSV(database, EMPLOYEES_CSV)
+	// db.ImportTypesFromCSV(database, EVENTTYPES_CSV, "eventTypes")
+	// db.ImportTypesFromCSV(database, DUTYTYPES_CSV, "dutyTypes")
+	// db.ImportTablesFromCSV(database, EVENTTABLE_CSV, "eventTable")
+	// db.ImportTablesFromCSV(database, DUTYTABLE_CSV, "dutyTable")
 
 	// fmt.Println(createCalendar(5, 2024))
 
-	// people := db.SelectFromPeople("%")
+	peoples := db.SelectFromPeople(database, "999")
 
-	// fmt.Print(people)
+	fmt.Print(peoples)
 }
