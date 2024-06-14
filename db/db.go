@@ -11,14 +11,23 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func InitDatabase(DB_FILE string) {
+func OpenDatabase(DB_FILE string) *sql.DB {
 
-	db, err := sql.Open("sqlite", DB_FILE)
+	database, err := sql.Open("sqlite", DB_FILE)
 	if err != nil {
 		log.Printf("Failed to open/create file %s with error %s", DB_FILE, err)
 	}
 
-	defer db.Close()
+	// Optimize SQLite for faster writes
+	_, err = database.Exec("PRAGMA synchronous = OFF; PRAGMA journal_mode = MEMORY;")
+	if err != nil {
+		log.Printf("Failed to optimize SQLite: %s", err)
+	}
+
+	return database
+}
+
+func InitDatabase(database *sql.DB) {
 
 	sqlStmt := `
 				CREATE TABLE IF NOT EXISTS people (employeeNumber INTEGER PRIMARY KEY, email TEXT, name TEXT, surname TEXT, team TEXT, UNIQUE (email));
@@ -27,7 +36,7 @@ func InitDatabase(DB_FILE string) {
 				CREATE TABLE IF NOT EXISTS eventTable (employeeNumber TEXT, code INTEGER, day TEXT, month TEXT, year TEXT, timestamp TEXT, who TEXT, deleted INT);
 				CREATE TABLE IF NOT EXISTS dutyTable (employeeNumber TEXT, code INTEGER, day TEXT, month TEXT, year TEXT, timestamp TEXT, who TEXT, deleted INT);
 				`
-	_, err = db.Exec(sqlStmt)
+	_, err := database.Exec(sqlStmt)
 	log.Printf("Creating Tables ...")
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
@@ -35,7 +44,7 @@ func InitDatabase(DB_FILE string) {
 	}
 }
 
-func ImportEmployeesFromCSV(DB_FILE string, csvPath string) {
+func ImportEmployeesFromCSV(database *sql.DB, csvPath string) {
 	f, err := os.Open(csvPath)
 	if err != nil {
 		log.Printf("Failed to open file %s with error : %s", csvPath, err)
@@ -47,13 +56,6 @@ func ImportEmployeesFromCSV(DB_FILE string, csvPath string) {
 	if err != nil {
 		log.Printf("missing header row(?): %s", err)
 	}
-
-	db, err := sql.Open("sqlite", DB_FILE)
-	if err != nil {
-		log.Printf("Failed to open/create file %s with error %s", DB_FILE, err)
-	}
-
-	defer db.Close()
 
 	for {
 		record, err := r.Read()
@@ -67,7 +69,7 @@ func ImportEmployeesFromCSV(DB_FILE string, csvPath string) {
 		surname := record[3]
 		team := record[4]
 
-		sqlStmt, err := db.Prepare("INSERT INTO people(employeeNumber, email, name, surname, team) VALUES(?, ?, ?, ?, ?)")
+		sqlStmt, err := database.Prepare("INSERT INTO people(employeeNumber, email, name, surname, team) VALUES(?, ?, ?, ?, ?)")
 		if err != nil {
 			log.Printf("INSERT prepare FAILED: %s", err)
 		}
@@ -80,7 +82,7 @@ func ImportEmployeesFromCSV(DB_FILE string, csvPath string) {
 	log.Printf("Import of %s DONE", f.Name())
 }
 
-func ImportTypesFromCSV(DB_FILE string, csvPath string, table string) {
+func ImportTypesFromCSV(database *sql.DB, csvPath string, table string) {
 
 	var switchStmt string
 	switch table {
@@ -104,13 +106,6 @@ func ImportTypesFromCSV(DB_FILE string, csvPath string, table string) {
 		log.Printf("missing header row(?): %s", err)
 	}
 
-	db, err := sql.Open("sqlite", DB_FILE)
-	if err != nil {
-		log.Printf("Failed to open/create file %s with error %s", DB_FILE, err)
-	}
-
-	defer db.Close()
-
 	for {
 		record, err := r.Read()
 		if errors.Is(err, io.EOF) {
@@ -121,7 +116,7 @@ func ImportTypesFromCSV(DB_FILE string, csvPath string, table string) {
 		description := record[1]
 		descriptionLong := record[2]
 		picture := record[3]
-		sqlStmt, err := db.Prepare(switchStmt)
+		sqlStmt, err := database.Prepare(switchStmt)
 		if err != nil {
 			log.Printf("INSERT prepare FAILED: %s", err)
 		}
@@ -134,7 +129,7 @@ func ImportTypesFromCSV(DB_FILE string, csvPath string, table string) {
 	log.Printf("Import of %s DONE", f.Name())
 }
 
-func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
+func ImportTablesFromCSV(database *sql.DB, csvPath string, table string) {
 
 	var switchStmt string
 	switch table {
@@ -158,20 +153,6 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 		log.Printf("missing header row(?): %s", err)
 	}
 
-	db, err := sql.Open("sqlite", DB_FILE)
-	if err != nil {
-		log.Printf("Failed to open/create file %s with error %s", DB_FILE, err)
-	}
-
-	// Optimize SQLite for faster writes
-	_, err = db.Exec("PRAGMA synchronous = OFF; PRAGMA journal_mode = MEMORY;")
-	if err != nil {
-		log.Printf("Failed to optimize SQLite: %s", err)
-		return
-	}
-
-	defer db.Close()
-
 	var i = 1
 
 	for {
@@ -190,7 +171,7 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 		timestamp := record[5]
 		who := record[6]
 		deleted := record[7]
-		sqlStmt, err := db.Prepare(switchStmt)
+		sqlStmt, err := database.Prepare(switchStmt)
 		if err != nil {
 			log.Printf("INSERT prepare FAILED: %s", err)
 		}
@@ -207,64 +188,18 @@ func ImportTablesFromCSV(DB_FILE string, csvPath string, table string) {
 	log.Printf("Import of %s DONE", f.Name())
 }
 
-func SelectFromTable(DB_FILE string, sqlStmt string) ([]map[string]interface{}, error) {
+// func SelectFromPeople(filter string) []People{} {
 
-	db, err := sql.Open("sqlite", DB_FILE)
-	if err != nil {
-		log.Printf("Failed to open file %s with error %s", DB_FILE, err)
-	}
-	defer db.Close()
+// 	// Build and run Query
+// 	sqlStmt := `SELECT * from people WHERE employeeNumber LIKE ?`
+// 	log.Printf("Query to be executed :  %s", sqlStmt)
+// 	rows, err := database.Query(sqlStmt, filter)
+// 	if err != nil {
+// 		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-	// Optimize SQLite for faster writes
-	_, err = db.Exec("PRAGMA synchronous = OFF; PRAGMA journal_mode = MEMORY;")
-	if err != nil {
-		log.Printf("Failed to optimize SQLite: %s", err)
-		return nil, err
-	}
+// 	log.Printf("Executed query: %s", sqlStmt)
 
-	rows, err := db.Query(sqlStmt)
-	if err != nil {
-		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
-		return nil, err
-	}
-	defer rows.Close()
-
-	log.Printf("Executed query: %s", sqlStmt)
-
-	// Get column names
-	columns, err := rows.Columns()
-	if err != nil {
-		return nil, err
-	}
-	// Create a slice of maps to hold the query results
-	var results []map[string]interface{}
-
-	for rows.Next() {
-		// Create a slice of interfaces to hold each column value
-		values := make([]interface{}, len(columns))
-		// Create a slice of pointers to each value
-		valuePtrs := make([]interface{}, len(columns))
-		for i := range values {
-			valuePtrs[i] = &values[i]
-		}
-
-		// Scan the row into the value pointers
-		if err := rows.Scan(valuePtrs...); err != nil {
-			return nil, err
-		}
-		// Create a map to represent the row
-		rowMap := make(map[string]interface{})
-		for i, col := range columns {
-			rowMap[col] = values[i]
-		}
-
-		// Append the row map to the results slice
-		results = append(results, rowMap)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return results, nil
-}
+// }

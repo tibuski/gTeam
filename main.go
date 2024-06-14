@@ -1,13 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/tibuski/gTeam/db"
 )
 
-type Employee struct {
+type People struct {
 	employeeNumber int
 	email          string
 	name           string
@@ -20,7 +17,7 @@ type Calendar struct {
 	days           []string
 }
 
-var Employees = []Employee{}
+var Employees = []People{}
 var TeamCalendar = []Calendar{}
 
 const DB_FILE = "./db/gTeam.db"
@@ -54,23 +51,17 @@ const DUTYTABLE_CSV = "./db/dutyTable.csv"
 // }
 
 func main() {
-
-	// db.InitDatabase(DB_FILE)
-	// db.ImportEmployeesFromCSV(DB_FILE, EMPLOYEES_CSV)
-	// db.ImportTypesFromCSV(DB_FILE, EVENTTYPES_CSV, "eventTypes")
-	// db.ImportTypesFromCSV(DB_FILE, DUTYTYPES_CSV, "dutyTypes")
-	// db.ImportTablesFromCSV(DB_FILE, EVENTTABLE_CSV, "eventTable")
-	// db.ImportTablesFromCSV(DB_FILE, DUTYTABLE_CSV, "dutyTable")
+	database := db.OpenDatabase(DB_FILE)
+	db.InitDatabase(database)
+	db.ImportEmployeesFromCSV(database, EMPLOYEES_CSV)
+	db.ImportTypesFromCSV(database, EVENTTYPES_CSV, "eventTypes")
+	db.ImportTypesFromCSV(database, DUTYTYPES_CSV, "dutyTypes")
+	db.ImportTablesFromCSV(database, EVENTTABLE_CSV, "eventTable")
+	db.ImportTablesFromCSV(database, DUTYTABLE_CSV, "dutyTable")
 
 	// fmt.Println(createCalendar(5, 2024))
 
-	sqlStmt := "SELECT * FROM eventTypes"
-	results, err := db.SelectFromTable(DB_FILE, sqlStmt)
-	if err != nil {
-		log.Fatalf("Query failed: %s", err)
-	}
+	// people := db.SelectFromPeople("%")
 
-	for _, row := range results {
-		fmt.Println(row)
-	}
+	// fmt.Print(people)
 }
