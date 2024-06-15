@@ -11,15 +11,13 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-type Employee struct {
-	employeeNumber int
-	email          string
-	name           string
-	surname        string
-	team           string
+type People struct {
+	EmployeeNumber int
+	Email          string
+	Name           string
+	Surname        string
+	Team           string
 }
-
-var People map[Employee]interface{}
 
 func OpenDatabase(DB_FILE string) *sql.DB {
 
@@ -198,29 +196,46 @@ func ImportTablesFromCSV(database *sql.DB, csvPath string, table string) {
 	log.Printf("Import of %s DONE", f.Name())
 }
 
-func SelectFromPeople(database *sql.DB, filter string) {
+func SelectFromPeople(database *sql.DB, filter string) ([]People, error) {
+	var Peoples []People
 
-	var peoples []People
+	// SQL query to select all columns from the 'people' table where 'employeeNumber' matches the filter
+	sqlStmt := `SELECT * FROM people WHERE employeeNumber LIKE ?`
 
-	sqlStmt := `SELECT * from people WHERE employeeNumber LIKE ?`
-	log.Printf("Query to be executed :  %s", sqlStmt)
-
-	// Run query and get row results
+	// Execute the query with the provided filter
 	rows, err := database.Query(sqlStmt, filter)
-
 	if err != nil {
+		// Log and return error if the query execution fails
 		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
+		return nil, err
 	}
+	// Ensure that rows are closed properly after processing
+	defer rows.Close()
 
+	// Iterate through the result set
 	for rows.Next() {
 		var p People
-		if err := rows.Scan(&p.employeeNumber, &p.email, &p.name, &p.surname, &p.team); err != nil {
+		// Scan the values from the current row into the People struct
+		err := rows.Scan(&p.EmployeeNumber, &p.Email, &p.Name, &p.Surname, &p.Team)
+		if err != nil {
+			// Log and return error if scanning the row fails
 			log.Println(err.Error())
+			return nil, err
 		}
-		peoples = append(peoples, p)
+		// Append the scanned People struct to the result slice
+		Peoples = append(Peoples, p)
 	}
 
+	// Check for any errors encountered during the iteration of rows
+	if err := rows.Err(); err != nil {
+		// Log and return error if any issues occurred during row iteration
+		log.Println("Error iterating through rows:", err)
+		return nil, err
+	}
+
+	// Log the executed query for debugging purposes
 	log.Printf("Executed query: %s", sqlStmt)
 
-	return (peoples)
+	// Return the slice of People and a nil error indicating success
+	return Peoples, nil
 }

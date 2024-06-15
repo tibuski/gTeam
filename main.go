@@ -54,7 +54,7 @@ func main() {
 
 	// fmt.Println(createCalendar(5, 2024))
 
-	peoples := db.SelectFromPeople(database, "999")
+	peoples, _ := db.SelectFromPeople(database, "%")
 
-	fmt.Print(peoples)
+	fmt.Print(peoples[1].Email)
 }
