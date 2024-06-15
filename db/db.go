@@ -197,44 +197,34 @@ func ImportTablesFromCSV(database *sql.DB, csvPath string, table string) {
 }
 
 func SelectFromPeople(database *sql.DB, filter string) ([]People, error) {
+
 	var Peoples []People
 
-	// SQL query to select all columns from the 'people' table where 'employeeNumber' matches the filter
-	sqlStmt := `SELECT * FROM people WHERE employeeNumber LIKE ?`
+	sqlStmt := `SELECT * FROM people WHERE employeenumber LIKE ?`
 
-	// Execute the query with the provided filter
 	rows, err := database.Query(sqlStmt, filter)
 	if err != nil {
-		// Log and return error if the query execution fails
 		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
 		return nil, err
 	}
-	// Ensure that rows are closed properly after processing
 	defer rows.Close()
 
 	// Iterate through the result set
 	for rows.Next() {
 		var p People
-		// Scan the values from the current row into the People struct
 		err := rows.Scan(&p.EmployeeNumber, &p.Email, &p.Name, &p.Surname, &p.Team)
 		if err != nil {
-			// Log and return error if scanning the row fails
 			log.Println(err.Error())
 			return nil, err
 		}
-		// Append the scanned People struct to the result slice
 		Peoples = append(Peoples, p)
 	}
 
 	// Check for any errors encountered during the iteration of rows
 	if err := rows.Err(); err != nil {
-		// Log and return error if any issues occurred during row iteration
 		log.Println("Error iterating through rows:", err)
 		return nil, err
 	}
-
-	// Log the executed query for debugging purposes
-	log.Printf("Executed query: %s", sqlStmt)
 
 	// Return the slice of People and a nil error indicating success
 	return Peoples, nil

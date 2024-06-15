@@ -56,5 +56,5 @@ func main() {
 
 	peoples, _ := db.SelectFromPeople(database, "%")
 
-	fmt.Print(peoples[1].Email)
+	fmt.Print(peoples)
 }

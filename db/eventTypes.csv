@@ -1,21 +1,21 @@
-code, description, descriptionLong, picture
-1, Holiday, Planned Holiday, sun_x.gif
-2, Holiday AM, Planned Holiday AM, sun_x2.gif
-3, Holiday PM, Planned Holiday PM, sun_x3.gif
-4, Mission, Mission (Intern) / on site (Extern), mushroom_red_X1.gif
-5, Training, Training, pow_X.gif
-6, Illness, Illness, dead.gif
-7, Public Holiday, Public Holiday, mushroom_green_X1.gif
-8, Mission AM, Mission AM, mushroom_red_X2.gif
-9, Mission PM, Mission PM, mushroom_red_X3.gif
-13, Drink, Drink, beer_.gif
-14, Flex, Flex, flower_x.gif
-15, HomeWorking, HomeWorking, home_X.gif
-16, Special, Special Event, special.gif
-22, CoolDay Hw AM, CoolDay Hw Morning, 12WH.gif
-24, CoolDay Hw PM, CoolDay Hw Afternoon, 12HW.gif
-25, Flex AM, Flex Morning, flowerAM.gif
-26, Flex PM, Flex Afternoon, flowerPM.gif
-27, HomeWorking AM, HomeWorking AM, HW_AM.gif
-28, HomeWorking PM, HomeWorking PM, HW_PM.gif
-10, RogierTower, RogierTower, champi_bifidus.gif
+code,description,descriptionLong,picture
+1,Holiday,Planned Holiday,sun_x.gif
+2,Holiday AM,Planned Holiday AM,sun_x2.gif
+3,Holiday PM,Planned Holiday PM,sun_x3.gif
+4,Mission,Mission (Intern) / on site (Extern),mushroom_red_X1.gif
+5,Training,Training,pow_X.gif
+6,Illness,Illness,dead.gif
+7,Public Holiday,Public Holiday,mushroom_green_X1.gif
+8,Mission AM,Mission AM,mushroom_red_X2.gif
+9,Mission PM,Mission PM,mushroom_red_X3.gif
+13,Drink,Drink,beer_.gif
+14,Flex,Flex,flower_x.gif
+15,HomeWorking,HomeWorking,home_X.gif
+16,Special,Special Event,special.gif
+22,CoolDay Hw AM,CoolDay Hw Morning,12WH.gif
+24,CoolDay Hw PM,CoolDay Hw Afternoon,12HW.gif
+25,Flex AM,Flex Morning,flowerAM.gif
+26,Flex PM,Flex Afternoon,flowerPM.gif
+27,HomeWorking AM,HomeWorking AM,HW_AM.gif
+28,HomeWorking PM,HomeWorking PM,HW_PM.gif
+10,RogierTower,RogierTower,champi_bifidus.gif
