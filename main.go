@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/tibuski/gTeam/db"
 )
 
 type Calendar struct {
 	employeeNumber int
+	email          string
 	days           []string
 }
 
@@ -20,28 +22,28 @@ const EVENTTABLE_CSV = "./db/eventTable.csv"
 const DUTYTYPES_CSV = "./db/dutyTypes.csv"
 const DUTYTABLE_CSV = "./db/dutyTable.csv"
 
-// func daysOfTheMonth(month int, year int) []string {
-// 	var days []string
-// 	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
-// 	end := start.AddDate(0, 1, -1)
-// 	for t := start; !t.After(end); t = t.AddDate(0, 0, 1) {
-// 		if t.Weekday() == 6 || t.Weekday() == 0 {
-// 			days = append(days, "W")
-// 		} else {
-// 			days = append(days, "0")
-// 		}
-// 	}
-// 	return days
-// }
+func daysOfTheMonth(month int, year int) []string {
+	var days []string
+	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	end := start.AddDate(0, 1, -1)
+	for t := start; !t.After(end); t = t.AddDate(0, 0, 1) {
+		if t.Weekday() == 6 || t.Weekday() == 0 {
+			days = append(days, "W")
+		} else {
+			days = append(days, "0")
+		}
+	}
+	return days
+}
 
-// func createCalendar(month, year int) []Calendar {
-// 	d := daysOfTheMonth(month, year)
-// 	for _, n := range Employees {
-// 		TeamCalendar = append(TeamCalendar, Calendar{employeeNumber: n.ame, Days: d})
-// 	}
+func createCalendar(p []db.People, month int, year int) []Calendar {
+	d := daysOfTheMonth(month, year)
+	for n := range len(p) {
+		TeamCalendar = append(TeamCalendar, Calendar{email: p[n].Email, employeeNumber: p[n].EmployeeNumber, days: d})
+	}
 
-// 	return TeamCalendar
-// }
+	return TeamCalendar
+}
 
 func main() {
 	database := db.OpenDatabase(DB_FILE)
@@ -52,9 +54,8 @@ func main() {
 	// db.ImportTablesFromCSV(database, EVENTTABLE_CSV, "eventTable")
 	// db.ImportTablesFromCSV(database, DUTYTABLE_CSV, "dutyTable")
 
-	// fmt.Println(createCalendar(5, 2024))
-
 	peoples, _ := db.SelectFromPeople(database, "%")
 
-	fmt.Print(peoples)
+	fmt.Println(createCalendar(peoples, 5, 2024))
+	// fmt.Print(peoples)
 }
