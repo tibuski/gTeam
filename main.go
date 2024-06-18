@@ -8,9 +8,12 @@ import (
 )
 
 type Calendar struct {
+	name           string
+	surname        string
+	days           []string
 	employeeNumber int
 	email          string
-	days           []string
+	team           string
 }
 
 var TeamCalendar = []Calendar{}
@@ -39,7 +42,7 @@ func daysOfTheMonth(month int, year int) []string {
 func createCalendar(p []db.People, month int, year int) []Calendar {
 	d := daysOfTheMonth(month, year)
 	for n := range len(p) {
-		TeamCalendar = append(TeamCalendar, Calendar{email: p[n].Email, employeeNumber: p[n].EmployeeNumber, days: d})
+		TeamCalendar = append(TeamCalendar, Calendar{name: p[n].Name, surname: p[n].Surname, days: d, email: p[n].Email, employeeNumber: p[n].EmployeeNumber, team: p[n].Team})
 	}
 
 	return TeamCalendar
@@ -56,6 +59,9 @@ func main() {
 
 	peoples, _ := db.SelectFromPeople(database, "%")
 
-	fmt.Println(createCalendar(peoples, 5, 2024))
-	// fmt.Print(peoples)
+	cal := createCalendar(peoples, 5, 2024)
+
+	for i := range len(cal) {
+		fmt.Println(cal[i])
+	}
 }
