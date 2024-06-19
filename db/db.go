@@ -246,7 +246,7 @@ func SelectFromPeople(database *sql.DB, filter string) ([]People, error) {
 	return Peoples, nil
 }
 
-func SelectPeopleAllEvents(database *sql.DB, day, month, year int) ([]PeopleUnion, error) {
+func SelectPeopleAllEvents(database *sql.DB, month, year int) ([]PeopleUnion, error) {
 
 	var PeoplesAllEvents []PeopleUnion
 
@@ -268,7 +268,7 @@ func SelectPeopleAllEvents(database *sql.DB, day, month, year int) ([]PeopleUnio
                 JOIN 
                     dutyTable d ON p.employeeNumber = d.employeeNumber
                 WHERE 
-                    d.day = ? AND d.month = ? AND d.year = ?
+                    d.month = ? AND d.year = ?
 
                 UNION ALL
 
@@ -289,10 +289,10 @@ func SelectPeopleAllEvents(database *sql.DB, day, month, year int) ([]PeopleUnio
                 JOIN 
                     eventTable e ON p.employeeNumber = e.employeeNumber
                 WHERE 
-                    e.day = ? AND e.month = ? AND e.year = ?
+                    e.month = ? AND e.year = ?
                 `
 
-	rows, err := database.Query(sqlStmt, day, month, year, day, month, year)
+	rows, err := database.Query(sqlStmt, month, year, month, year)
 	if err != nil {
 		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
 		return nil, err
