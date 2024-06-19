@@ -25,8 +25,8 @@ type PeopleUnion struct {
 	Name           string
 	Surname        string
 	Team           string
-	DutyCode       int
-	EventCode      int
+	DutyCode       string
+	EventCode      string
 	Day            int
 	Month          int
 	Year           int
@@ -263,6 +263,7 @@ func SelectPeopleAllEvents(database *sql.DB, month, year int) ([]PeopleUnion, er
                     d.timestamp,
                     d.who,
                     d.deleted
+
                 FROM 
                     people p
                 JOIN 

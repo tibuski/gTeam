@@ -54,10 +54,15 @@ func createCalendar(database *sql.DB, month int, year int) []Calendar {
 		TeamCalendar = append(TeamCalendar, Calendar{name: p[n].Name, surname: p[n].Surname, days: d, email: p[n].Email, employeeNumber: p[n].EmployeeNumber, team: p[n].Team})
 	}
 	// Insert all events in TeamCalendar
+	for t := range len(TeamCalendar) {
+		for i := range len(e) {
+			if TeamCalendar[t].employeeNumber == e[i].EmployeeNumber {
+				TeamCalendar[t].days[e[i].Day].code = e[i].EventCode
+			}
+		}
+	}
 
-	fmt.Println(d)
-	fmt.Println(p)
-	fmt.Println(e)
+	fmt.Println(TeamCalendar)
 
 	return TeamCalendar
 }
