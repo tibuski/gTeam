@@ -19,6 +19,22 @@ type People struct {
 	Team           string
 }
 
+type PeopleUnion struct {
+	EmployeeNumber int
+	Email          string
+	Name           string
+	Surname        string
+	Team           string
+	DutyCode       int
+	EventCode      int
+	Day            int
+	Month          int
+	Year           int
+	Timestamp      string
+	Who            string
+	Deleted        int
+}
+
 func OpenDatabase(DB_FILE string) *sql.DB {
 
 	database, err := sql.Open("sqlite", DB_FILE)
@@ -38,12 +54,12 @@ func OpenDatabase(DB_FILE string) *sql.DB {
 func InitDatabase(database *sql.DB) {
 
 	sqlStmt := `
-				CREATE TABLE IF NOT EXISTS people (employeeNumber INTEGER PRIMARY KEY, email TEXT, name TEXT, surname TEXT, team TEXT, UNIQUE (email));
-				CREATE TABLE IF NOT EXISTS eventTypes (code INTEGER PRIMARY KEY, description TEXT, descriptionLong TEXT, picture TEXT);
-				CREATE TABLE IF NOT EXISTS dutyTypes (code INTEGER PRIMARY KEY, description TEXT, descriptionLong TEXT, picture TEXT);
-				CREATE TABLE IF NOT EXISTS eventTable (employeeNumber TEXT, code INTEGER, day TEXT, month TEXT, year TEXT, timestamp TEXT, who TEXT, deleted INT);
-				CREATE TABLE IF NOT EXISTS dutyTable (employeeNumber TEXT, code INTEGER, day TEXT, month TEXT, year TEXT, timestamp TEXT, who TEXT, deleted INT);
-				`
+                CREATE TABLE IF NOT EXISTS people (employeeNumber INTEGER PRIMARY KEY, email TEXT, name TEXT, surname TEXT, team TEXT, UNIQUE (email));
+                CREATE TABLE IF NOT EXISTS eventTypes (code INTEGER PRIMARY KEY, description TEXT, descriptionLong TEXT, picture TEXT);
+                CREATE TABLE IF NOT EXISTS dutyTypes (code INTEGER PRIMARY KEY, description TEXT, descriptionLong TEXT, picture TEXT);
+                CREATE TABLE IF NOT EXISTS eventTable (employeeNumber TEXT, code INTEGER, day TEXT, month TEXT, year TEXT, timestamp TEXT, who TEXT, deleted INT);
+                CREATE TABLE IF NOT EXISTS dutyTable (employeeNumber TEXT, code INTEGER, day TEXT, month TEXT, year TEXT, timestamp TEXT, who TEXT, deleted INT);
+                `
 	_, err := database.Exec(sqlStmt)
 	log.Printf("Creating Tables ...")
 	if err != nil {
@@ -228,4 +244,78 @@ func SelectFromPeople(database *sql.DB, filter string) ([]People, error) {
 
 	// Return the slice of People and a nil error indicating success
 	return Peoples, nil
+}
+
+func SelectPeopleAllEvents(database *sql.DB, day, month, year int) ([]PeopleUnion, error) {
+
+	var PeoplesAllEvents []PeopleUnion
+
+	sqlStmt := `
+                SELECT 
+                    p.employeeNumber,
+                    p.email,
+                    p.name,
+                    p.surname,
+                    p.team,
+                    d.code AS dutyCode,
+                    0 AS eventCode,
+                    d.day, d.month, d.year,
+                    d.timestamp,
+                    d.who,
+                    d.deleted
+                FROM 
+                    people p
+                JOIN 
+                    dutyTable d ON p.employeeNumber = d.employeeNumber
+                WHERE 
+                    d.day = ? AND d.month = ? AND d.year = ?
+
+                UNION ALL
+
+                SELECT 
+                    p.employeeNumber,
+                    p.email,
+                    p.name,
+                    p.surname,
+                    p.team,
+                    0 AS dutyCode,
+                    e.code AS eventCode,
+                    e.day, e.month, e.year,
+                    e.timestamp,
+                    e.who,
+                    e.deleted
+                FROM 
+                    people p
+                JOIN 
+                    eventTable e ON p.employeeNumber = e.employeeNumber
+                WHERE 
+                    e.day = ? AND e.month = ? AND e.year = ?
+                `
+
+	rows, err := database.Query(sqlStmt, day, month, year, day, month, year)
+	if err != nil {
+		log.Printf("Failed to execute query %q: %s", sqlStmt, err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Iterate through the result set
+	for rows.Next() {
+		var p PeopleUnion
+		err := rows.Scan(&p.EmployeeNumber, &p.Email, &p.Name, &p.Surname, &p.Team, &p.DutyCode, &p.EventCode, &p.Day, &p.Month, &p.Year, &p.Timestamp, &p.Who, &p.Deleted)
+		if err != nil {
+			log.Println(err.Error())
+			return nil, err
+		}
+		PeoplesAllEvents = append(PeoplesAllEvents, p)
+	}
+
+	// Check for any errors encountered during the iteration of rows
+	if err := rows.Err(); err != nil {
+		log.Println("Error iterating through rows:", err)
+		return nil, err
+	}
+
+	// Return the slice of People and a nil error indicating success
+	return PeoplesAllEvents, nil
 }

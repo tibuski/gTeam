@@ -57,9 +57,7 @@ func main() {
 	// db.ImportTablesFromCSV(database, EVENTTABLE_CSV, "eventTable")
 	// db.ImportTablesFromCSV(database, DUTYTABLE_CSV, "dutyTable")
 
-	peoples, _ := db.SelectFromPeople(database, "%")
-
-	cal := createCalendar(peoples, 5, 2024)
+	cal, _ := db.SelectPeopleAllEvents(database, 15, 5, 2024)
 
 	for i := range len(cal) {
 		fmt.Println(cal[i])
